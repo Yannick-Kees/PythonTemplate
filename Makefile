@@ -1,33 +1,30 @@
-# Variables
-VENV_DIR = .venv
+ENV_NAME = $(shell basename $(shell pwd))
 REQUIREMENTS = requirements.txt
 REGISTRY = registry.github.com
-
-
-PYTHON = $(VENV_DIR)/bin/python
-PIP = $(VENV_DIR)/bin/pip
+PYTHON_VERSION = $(shell cat .python-version)
 DOCKERFILE = Dockerfile
-TAG=$(shell date +"%m%d%Y_%H%M")
+TAG = $(shell date +"%Y%m%d_%H%M")
 
+# Conda environment activation command
+ACTIVATE_ENV = . $(shell conda info --base)/etc/profile.d/conda.sh && conda activate $(ENV_NAME)
+
+# Conda Channels
+CONDA_CHANNELS = -c defaults -c conda-forge
 
 # Default target
 .PHONY: all
 all: install
 
-# Create virtual environment and install requirements
-.PHONY: install
-install: $(VENV_DIR)/bin/activate
+# Create conda environment and install requirements
+install: $(REQUIREMENTS)
+	. $(shell conda info --base)/etc/profile.d/conda.sh && conda create -y -n $(ENV_NAME) python=$(PYTHON_VERSION) $(CONDA_CHANNELS)
+	$(ACTIVATE_ENV) && pip install -r $(REQUIREMENTS)
+	$(ACTIVATE_ENV) && pip install pipreqs
 
-$(VENV_DIR)/bin/activate: $(REQUIREMENTS)
-	python3 -m venv $(VENV_DIR)
-	$(PIP) install -r $(REQUIREMENTS)
-	touch $(VENV_DIR)/bin/activate
-	$(PIP) install pipreqs
-
-# Run the script using the virtual environment
+# Run the script using the conda environment
 .PHONY: run
-run: $(VENV_DIR)/bin/activate
-	$(PYTHON) src/main.py
+run:
+	$(ACTIVATE_ENV) && python src/main.py
 
 # Update requirements.txt using pipreqs
 .PHONY: update
@@ -54,7 +51,8 @@ test:
 # Clean the virtual environment
 .PHONY: clean
 clean:
-	rm -rf $(VENV_DIR)
+	@echo "Removing conda environment '$(ENV_NAME)' and cleaning up..."
+	. $(shell conda info --base)/etc/profile.d/conda.sh && conda env remove -n $(ENV_NAME)
 
 # Help message
 .PHONY: help
