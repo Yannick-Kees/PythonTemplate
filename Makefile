@@ -20,17 +20,15 @@ install: $(REQUIREMENTS)
 	. $(shell conda info --base)/etc/profile.d/conda.sh && conda create -y -n $(ENV_NAME) python=$(PYTHON_VERSION) $(CONDA_CHANNELS)
 	$(ACTIVATE_ENV) && pip install -r $(REQUIREMENTS)
 	$(ACTIVATE_ENV) && pip install pipreqs
+	$(ACTIVATE_ENV) && pip install pytest
 
 # Run the script using the conda environment
 .PHONY: run
 run:
 	$(ACTIVATE_ENV) && python src/main.py
 
-.PHONY: lint
-lint:
 
-
-.PHONY: lint
+.PHONY: name
 name:
 	@echo $(ENV_NAME)
 
@@ -56,6 +54,21 @@ mainmaster:
 	git checkout master 
 	git branch -m main
 
+
+.PHONY: lint 
+lint:
+	@$(ACTIVATE_ENV) && pylint src 
+	@$(ACTIVATE_ENV) && pylint Tests 
+	@$(ACTIVATE_ENV) && black src 
+	@$(ACTIVATE_ENV) && black Tests 
+
+
+.PHONY: header
+.header:
+	@$(ACTIVATE_ENV) && python Tests/header.py
+
+
+.PHONY: stats
 stats:
 	@echo "-- Conda Channels --"
 	@conda config --show channels
@@ -72,7 +85,6 @@ build:
 	@sed -i "s|image:.*|image: ${REGISTRY}:v${TAG}|" docker-compose.yaml
 
 # docker build -t $(IMAGE_NAME) -f $(DOCKERFILE) .
-
 
 .PHONY: test
 test:
