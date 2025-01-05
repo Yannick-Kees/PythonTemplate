@@ -34,7 +34,7 @@ name:
 
 .PHONY: push
 push:
-# git remote add origin git@gitlab.dlr.de:saife/tp3/iqim.git
+# git remote add origin git@gitlab.de:group/project.git
 # git remote remove origin
 	git init
 	git add .
