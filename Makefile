@@ -11,9 +11,12 @@ ACTIVATE_ENV = . $(shell conda info --base)/etc/profile.d/conda.sh && conda acti
 # Conda Channels
 CONDA_CHANNELS = -c defaults -c conda-forge
 
+
+
 # Default target
 .PHONY: all
 all: install
+
 
 # Create conda environment and install requirements
 install: $(REQUIREMENTS)
@@ -22,26 +25,28 @@ install: $(REQUIREMENTS)
 	$(ACTIVATE_ENV) && pip install pipreqs
 	$(ACTIVATE_ENV) && pip install pytest
 
+
 # Run the script using the conda environment
 .PHONY: run
 run:
 	$(ACTIVATE_ENV) && python src/main.py
 
-
+# Print name
 .PHONY: name
 name:
 	@echo $(ENV_NAME)
 
-.PHONY: push
-push:
+
+# Push to gitlab
 # git remote add origin git@gitlab.de:group/project.git
 # git remote remove origin
+.PHONY: push
+push:
 	git init
 	git add .
 	git commit -m $(TAG)
 	git push origin main
 		
-
 
 # Update requirements.txt using pipreqs
 .PHONY: update
@@ -50,24 +55,30 @@ update:
 	@pipreqs --force --encoding=iso-8859-1 --ignore ".venv"
 	@$(ACTIVATE_ENV) && conda env export > environment.yml
 
+
+# Change master to main branch
+.PHONY: mainmaster
 mainmaster:
 	git checkout master 
 	git branch -m main
 
 
+# Lint Python Files
 .PHONY: lint 
 lint:
-	@$(ACTIVATE_ENV) && pylint src 
-	@$(ACTIVATE_ENV) && pylint Tests 
 	@$(ACTIVATE_ENV) && black src 
 	@$(ACTIVATE_ENV) && black Tests 
+	@$(ACTIVATE_ENV) && pylint src 
+	@$(ACTIVATE_ENV) && pylint Tests 
+	
 
-
+# Add header and licence information
 .PHONY: header
 .header:
 	@$(ACTIVATE_ENV) && python Tests/header.py
 
 
+# Print git Stats
 .PHONY: stats
 stats:
 	@echo "-- Conda Channels --"
@@ -79,13 +90,14 @@ stats:
 
 
 # Build the Docker container
+# docker build -t $(IMAGE_NAME) -f $(DOCKERFILE) .
 .PHONY: build
 build:
 	@echo "Updating Container-Tag"
 	@sed -i "s|image:.*|image: ${REGISTRY}:v${TAG}|" docker-compose.yaml
 
-# docker build -t $(IMAGE_NAME) -f $(DOCKERFILE) .
 
+# Test via PyTest
 .PHONY: test
 test:
 	pytest
@@ -96,6 +108,7 @@ test:
 clean:
 	@echo "Removing conda environment '$(ENV_NAME)' and cleaning up..."
 	. $(shell conda info --base)/etc/profile.d/conda.sh && conda env remove -n $(ENV_NAME)
+
 
 # Help message
 .PHONY: help
