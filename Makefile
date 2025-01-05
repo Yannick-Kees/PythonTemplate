@@ -26,13 +26,44 @@ install: $(REQUIREMENTS)
 run:
 	$(ACTIVATE_ENV) && python src/main.py
 
+.PHONY: lint
+lint:
+
+
+.PHONY: lint
+name:
+	@echo $(ENV_NAME)
+
+.PHONY: push
+push:
+# git remote add origin git@gitlab.dlr.de:saife/tp3/iqim.git
+# git remote remove origin
+	git init
+	git add .
+	git commit -m $(TAG)
+	git push origin main
+		
+
+
 # Update requirements.txt using pipreqs
 .PHONY: update
 update:
 	@echo "Updating requirements.txt using pipreqs..."; 
 	@pipreqs --force --encoding=iso-8859-1 --ignore ".venv"
+	@$(ACTIVATE_ENV) && conda env export > environment.yml
 
-	
+mainmaster:
+	git checkout master 
+	git branch -m main
+
+stats:
+	@echo "-- Conda Channels --"
+	@conda config --show channels
+	@echo "-- Current Branch --"
+	@git branch --show-current
+	@echo "-- Git Origin --"
+	@git remote -v
+
 
 # Build the Docker container
 .PHONY: build
