@@ -1,8 +1,10 @@
 [project]
-name = "python_template"
+name = "{{ project_slug }}"
 version = "0.1.0"
-description = "A Template for Python Projects"
-authors = [{name = "Yannick Kees"}]
+description = "{{ project_description }}"
+authors = [
+    {name = "{{ author_name }}", email = "{{ author_email }}"}
+]
 license = {text = "MIT"}
 readme = "README.md"
 requires-python = ">=3.9"
