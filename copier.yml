@@ -7,7 +7,6 @@ _min_copier_version: "9.0.0"
 
 # Template settings
 _templates_suffix: .jinja
-_subdirectory: utils  # Optional: Template files in subfolder
 
 _answers_file: utils/copier-answers.yml
 
