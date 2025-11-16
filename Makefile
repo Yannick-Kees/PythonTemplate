@@ -19,6 +19,7 @@ help:
 .PHONY: all
 all: install
 
+
 # Create conda environment and install requirements
 install:
 	@echo "Installing dependencies with uv..."
@@ -32,6 +33,7 @@ install:
 	fi
 	@echo "Installing dependencies..."
 	uv run uv pip install -e .
+
 
 install-dev:
 	@echo "Installing with development dependencies..."
@@ -109,7 +111,7 @@ build:
 # Test via PyTest
 .PHONY: test
 test:
-	pytest
+	uvx pytest
 
 
 # Clean the virtual environment
@@ -117,6 +119,3 @@ test:
 clean:
 	@echo "Removing conda environment '$(ENV_NAME)' and cleaning up..."
 	. $(shell conda info --base)/etc/profile.d/conda.sh && conda env remove -n $(ENV_NAME)
-
-
-
