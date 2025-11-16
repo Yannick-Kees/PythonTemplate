@@ -72,14 +72,17 @@ update:
 
 format:
 	@echo "Formatting code..."
-	find src -type f -name "*.py" -exec uvx reuse annotate --license MIT --copyright "Yannick Kees" {} +
-	uvx black src/
-	uvx ruff check src/ --fix
+	@find src -type f -name "*.py" -exec uvx reuse annotate --license MIT --copyright "Yannick Kees" {} +
+	@uvx black src/
+	@uvx ruff check src/ --fix
+	@uvx isort src/
+	@uvx docformatter --in-place --recursive src/
 	@echo "Format complete!"
 
 lint:
 	@echo "Linting code with ruff..."
-	uvx ruff check src/
+	@uvx ruff check src/ --select ALL --ignore T201,D203,D213
+	@uvx codespell src/
 	@echo "Lint check complete!"
 
 
