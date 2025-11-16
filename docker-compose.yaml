@@ -1,5 +1,5 @@
 services:
-  ki-server:
+  my-service:
     build: .
     network_mode: host
     container_name: python-script
