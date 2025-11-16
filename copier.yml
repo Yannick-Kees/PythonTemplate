@@ -88,11 +88,11 @@ author_email:
 _tasks:
   # Initialize git if not exists
   - command: git init
-    when: "{{ _stage == 'task' and not '.git' | is_dir }}"
+    when: "{{ _stage == 'task'   }}"
   
   # Initialize uv project
   - command: make install
-    when: "{{ _stage == 'task' and not '.git' | is_dir }}"
+    when: "{{ _stage == 'task'  }}"
   
 
 # ============================================================================
