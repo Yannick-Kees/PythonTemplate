@@ -6,5 +6,5 @@ Python Template for DevOps Workflow
 
 Run
 ```
-uvx copier copy gh:Yannick-Kees/PythonTemplate
+uvx copier copy gh:Yannick-Kees/PythonTemplate . --trust
 ```

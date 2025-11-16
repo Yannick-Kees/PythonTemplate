@@ -74,12 +74,10 @@ project_description:
 author_name:
   type: str
   help: Your name
-  default: "{{ 'git config user.name' | shell }}"
 
 author_email:
   type: str
   help: Your email
-  default: "{{ 'git config user.email' | shell }}"
 
 
 # ============================================================================
