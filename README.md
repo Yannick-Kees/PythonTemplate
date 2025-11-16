@@ -6,5 +6,6 @@ Python Template for DevOps Workflow
 
 Run
 ```
-uvx copier copy gh:Yannick-Kees/PythonTemplate . --trust
+mkdir my_project && cd my_project
+uvx --with jinja2-time copier copy gh:Yannick-Kees/PythonTemplate . --trust
 ```
