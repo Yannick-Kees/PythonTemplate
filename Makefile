@@ -1,40 +1,56 @@
-ENV_NAME = $(shell basename $(shell pwd))
 REQUIREMENTS = requirements.txt
 REGISTRY = registry.github.com
 PYTHON_VERSION = $(shell cat .python-version)
 DOCKERFILE = Dockerfile
 TAG = $(shell date +"%Y%m%d_%H%M")
+VENV = .venv/bin/activate
 
-# Conda environment activation command
-ACTIVATE_ENV = . $(shell conda info --base)/etc/profile.d/conda.sh && conda activate $(ENV_NAME)
-
-# Conda Channels
-CONDA_CHANNELS = -c defaults -c conda-forge
-
-
+# Help message
+.PHONY: help
+help:
+	@echo "Usage:"
+	@echo "  make install   - Create virtual environment and install requirements"
+	@echo "  make run       - Run the script using the virtual environment"
+	@echo "  make build     - Build the Docker container"
+	@echo "  make clean     - Remove the virtual environment"
+	@echo "  make help      - Display this help message"
 
 # Default target
 .PHONY: all
 all: install
 
-
 # Create conda environment and install requirements
-install: $(REQUIREMENTS)
-	. $(shell conda info --base)/etc/profile.d/conda.sh && conda create -y -n $(ENV_NAME) python=$(PYTHON_VERSION) $(CONDA_CHANNELS)
-	$(ACTIVATE_ENV) && pip install -r $(REQUIREMENTS)
-	$(ACTIVATE_ENV) && pip install pipreqs
-	$(ACTIVATE_ENV) && pip install pytest
+install:
+	@echo "Installing dependencies with uv..."
+	@if ! command -v uv &> /dev/null; then \
+		echo "uv is not installed. Installing uv..."; \
+		curl -LsSf https://astral.sh/uv/install.sh | sh; \
+	fi
+	@if [ ! -d .venv ]; then \
+		echo "Creating virtual environment..."; \
+		uv venv; \
+	fi
+	@echo "Installing dependencies..."
+	uv run uv pip install -e .
+
+install-dev:
+	@echo "Installing with development dependencies..."
+	@if ! command -v uv &> /dev/null; then \
+		echo "uv is not installed. Installing uv..."; \
+		curl -LsSf https://astral.sh/uv/install.sh | sh; \
+	fi
+	@if [ ! -d .venv ]; then \
+		echo "Creating virtual environment..."; \
+		uv venv; \
+	fi
+	@echo "Installing dependencies with dev extras..."
+	uv pip install -e ".[dev]"
 
 
 # Run the script using the conda environment
 .PHONY: run
 run:
-	$(ACTIVATE_ENV) && python src/main.py
-
-# Print name
-.PHONY: name
-name:
-	@echo $(ENV_NAME)
+	uv run src/main.py
 
 
 # Push to gitlab
@@ -51,26 +67,19 @@ push:
 # Update requirements.txt using pipreqs
 .PHONY: update
 update:
-	@echo "Updating requirements.txt using pipreqs..."; 
-	@pipreqs --force --encoding=iso-8859-1 --ignore ".venv"
-	@$(ACTIVATE_ENV) && conda env export > environment.yml
 
+format:
+	@echo "Formatting code..."
+	find pages src -type f -name "*.py" -exec uvx reuse annotate --license MIT --copyright "Yannick Kees" {} +
+	uvx black app.py pages/ src/
+	uvx ruff check app.py pages/ src/ --fix
+	@echo "Format complete!"
 
-# Change master to main branch
-.PHONY: mainmaster
-mainmaster:
-	git checkout master 
-	git branch -m main
-
-
-# Lint Python Files
-.PHONY: lint 
 lint:
-	@$(ACTIVATE_ENV) && black src 
-	@$(ACTIVATE_ENV) && black Tests 
-	@$(ACTIVATE_ENV) && pylint src 
-	@$(ACTIVATE_ENV) && pylint Tests 
-	
+	@echo "Linting code with ruff..."
+	uvx ruff check app.py pages/ src/
+	@echo "Lint check complete!"
+
 
 # Add header and licence information
 .PHONY: header
@@ -110,12 +119,4 @@ clean:
 	. $(shell conda info --base)/etc/profile.d/conda.sh && conda env remove -n $(ENV_NAME)
 
 
-# Help message
-.PHONY: help
-help:
-	@echo "Usage:"
-	@echo "  make install   - Create virtual environment and install requirements"
-	@echo "  make run       - Run the script using the virtual environment"
-	@echo "  make build     - Build the Docker container"
-	@echo "  make clean     - Remove the virtual environment"
-	@echo "  make help      - Display this help message"
+
