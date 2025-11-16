@@ -1,5 +1,6 @@
-# Copyright (c) 2025, Your Name
-# Licensed under the MIT License. See LICENSE for details.
+# SPDX-FileCopyrightText: 2025 Yannick Kees
+#
+# SPDX-License-Identifier: MIT
 
 """
 Description

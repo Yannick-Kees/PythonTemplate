@@ -70,14 +70,14 @@ update:
 
 format:
 	@echo "Formatting code..."
-	find pages src -type f -name "*.py" -exec uvx reuse annotate --license MIT --copyright "Yannick Kees" {} +
-	uvx black app.py pages/ src/
-	uvx ruff check app.py pages/ src/ --fix
+	find src -type f -name "*.py" -exec uvx reuse annotate --license MIT --copyright "Yannick Kees" {} +
+	uvx black src/
+	uvx ruff check src/ --fix
 	@echo "Format complete!"
 
 lint:
 	@echo "Linting code with ruff..."
-	uvx ruff check app.py pages/ src/
+	uvx ruff check src/
 	@echo "Lint check complete!"
 
 
