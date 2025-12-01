@@ -86,7 +86,7 @@ author_email:
 
 _tasks:
   # Initialize git if not exists
-  - command: git init -b main
+  - command: git init
     when: "{{ _stage == 'task'   }}"
   
 
